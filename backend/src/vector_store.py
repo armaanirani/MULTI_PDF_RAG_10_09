@@ -5,11 +5,13 @@ from langchain.docstore.document import Document
 from dotenv import load_dotenv
 from config import EMBEDDING_MODEL_NAME
 
+from logger.logger_config import logger
+
 load_dotenv()
 
 def _get_embeddings_model():
     """Initializes and returns the OpenAI embedding model"""
-    print(f"Initializing embedding model: {EMBEDDING_MODEL_NAME}")
+    logger.info(f"Initializing embedding model: {EMBEDDING_MODEL_NAME}")
     return OpenAIEmbeddings(
         model=EMBEDDING_MODEL_NAME
     )
@@ -23,19 +25,19 @@ def create_index(text_chunks: List[Document], save_path: str):
         save_path (str): The file path where the FAISS index will be saved.
     """
     if not text_chunks:
-        print("No text chunks provided to create vector store.")
+        logger.info("No text chunks provided to create vector store.")
         return
     try:
         embeddings = _get_embeddings_model()
-        print("Creating vector store from documents...")
+        logger.info("Creating vector store from documents...")
         vectorstore = FAISS.from_documents(documents=text_chunks, embedding=embeddings)
         
-        print(f"Saving vector store to: {save_path}")
+        logger.info(f"Saving vector store to: {save_path}")
         vectorstore.save_local(save_path)
         
-        print("Vector store saved successfully.")
+        logger.info("Vector store saved successfully.")
     except Exception as e:
-        print(f"Error creating and saving vector store: {e}")
+        logger.error(f"Error creating and saving vector store: {e}")
 
 def load_index(load_path: str):
     """
@@ -50,14 +52,14 @@ def load_index(load_path: str):
     try:
         embeddings = _get_embeddings_model()
         
-        print(f"loading vector store from: {load_path}")
+        logger.info(f"loading vector store from: {load_path}")
         vectorstore = FAISS.load_local(load_path, embeddings, allow_dangerous_deserialization=True)
         
-        print("Vector store loaded successfully")
+        logger.info("Vector store loaded successfully")
         
         return vectorstore
     except Exception as e:
-        print(f"Error loading vector store: {e}")
+        logger.error(f"Error loading vector store: {e}")
         raise
 
 def update_index(new_text_chunks: List[Document], index_path: str):
@@ -69,21 +71,21 @@ def update_index(new_text_chunks: List[Document], index_path: str):
         index_path (str): The path to the existing FAISS index.
     """
     if not new_text_chunks:
-        print("No new text chunks to add.")
+        logger.info("No new text chunks to add.")
         return
     try:
-        print("Loading existing index to update.")
+        logger.info("Loading existing index to update.")
         db = load_index(index_path)
         
-        print(f"Adding {len(new_text_chunks)} new chunks to the index.")
+        logger.info(f"Adding {len(new_text_chunks)} new chunks to the index.")
         db.add_documents(new_text_chunks)
         
-        print(f"Saving updated index back to {index_path}.")
+        logger.info(f"Saving updated index back to {index_path}.")
         db.save_local(index_path)
         
-        print("Index updated and saved successfully.")
+        logger.info("Index updated and saved successfully.")
     except Exception as e:
-        print(f"Failed to update FAISS index: {e}")
+        logger.error(f"Failed to update FAISS index: {e}")
         
-        print("Falling back to creating a new index from the new chunks.")
+        logger.info("Falling back to creating a new index from the new chunks.")
         create_index(new_text_chunks, index_path)        

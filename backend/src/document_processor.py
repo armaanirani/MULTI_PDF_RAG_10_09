@@ -4,6 +4,8 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from typing import List
 from langchain.docstore.document import Document
 
+from logger.logger_config import logger
+
 def load_documents(source_dir: str) -> List[Document]:
     """
     Loads all PDF files from a given source directory.
@@ -17,10 +19,10 @@ def load_documents(source_dir: str) -> List[Document]:
     """
     documents = []
     if not os.path.exists(source_dir):
-        print(f"Error: Directory not found at {source_dir}")
+        logger.error(f"Error: Directory not found at {source_dir}")
         return documents
     
-    print(f"Loading documents from: {source_dir}")
+    logger.info(f"Loading documents from: {source_dir}")
     for file in os.listdir(source_dir):
         if file.endswith(".pdf"):
             pdf_path = os.path.join(source_dir, file)
@@ -28,9 +30,9 @@ def load_documents(source_dir: str) -> List[Document]:
                 loader = PyMuPDFLoader(pdf_path)
                 documents.extend(loader.load())
             except Exception as e:
-                print(f"Error loading {pdf_path}: {e}")
+                logger.error(f"Error loading {pdf_path}: {e}")
     
-    print(f"Loaded {len(documents)} document pages in total.")
+    logger.info(f"Loaded {len(documents)} document pages in total.")
     
     return documents
 
@@ -53,10 +55,10 @@ def get_text_chunks(documents: List[Document]) -> List[Document]:
             chunk_overlap=200
         )
         chunks = text_splitter.split_documents(documents)
-        print(f"Split documents into {len(chunks)} chunks.")
+        logger.info(f"Split documents into {len(chunks)} chunks.")
         
         return chunks
     except Exception as e:
-        print(f"Error splitting text: {e}")
+        logger.error(f"Error splitting text: {e}")
         
         return []

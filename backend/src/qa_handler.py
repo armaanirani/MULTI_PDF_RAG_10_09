@@ -4,6 +4,8 @@ from langchain_core.output_parsers import StrOutputParser
 from .llm import load_llm
 from dotenv import load_dotenv
 
+from logger.logger_config import logger
+
 load_dotenv()
 
 def create_qa_chain(retriever):
@@ -43,5 +45,5 @@ def create_qa_chain(retriever):
     )
 
 
-    print("RAG chain created successfully.")
+    logger.info("RAG chain created successfully.")
     return rag_chain_with_source

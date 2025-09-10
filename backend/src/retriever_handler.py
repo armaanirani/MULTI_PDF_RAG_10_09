@@ -1,6 +1,8 @@
 from langchain_community.vectorstores import FAISS
 from config import RETRIEVER_SEARCH_KWARGS, RETRIEVER_SEARCH_TYPE
 
+from logger.logger_config import logger
+
 def get_retriever(db):
     
     if not isinstance(db, FAISS):
@@ -10,9 +12,9 @@ def get_retriever(db):
             search_type=RETRIEVER_SEARCH_TYPE,
             search_kwargs=RETRIEVER_SEARCH_KWARGS
         )
-        print("Retriever created successfully.")
+        logger.info("Retriever created successfully.")
         
         return retriever
     except Exception as e:
-        print(f"Error creating retriever: {e}")
+        logger.error(f"Error creating retriever: {e}")
         raise
