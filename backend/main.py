@@ -9,6 +9,7 @@ from typing import List
 from src import qa_handler, vector_store, retriever_handler
 import config
 from tasks import process_documents_task
+from logger.logger_config import logger
 
 
 @asynccontextmanager
@@ -18,10 +19,10 @@ async def lifespan(app: FastAPI):
     This context manager ensures that necessary directories are created
     when the application starts.
     """
-    print("Lifespan startup: Creating necessary directories...")
+    logger.info("Lifespan startup: Creating necessary directories...")
     os.makedirs(config.UPLOAD_DIR, exist_ok=True)
     os.makedirs(os.path.dirname(config.VECTOR_STORE_PATH), exist_ok=True)
-    print("Lifespan startup: Directories are ready.")
+    logger.info("Lifespan startup: Directories are ready.")
     yield
 
 
@@ -65,7 +66,7 @@ async def upload_pdfs(
         file_path = os.path.join(config.UPLOAD_DIR, file.filename)
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
-        print(f"Saved file: {file.filename}")
+        logger.info(f"Saved file: {file.filename}")
 
     # Add the processing task to run in the background
     background_tasks.add_task(process_documents_task, config.UPLOAD_DIR, config.VECTOR_STORE_PATH)
@@ -84,7 +85,7 @@ async def ask_question(question: Question):
         )
 
     try:
-        print(f"Received query: {question.query}")
+        logger.info(f"Received query: {question.query}")
         db = vector_store.load_index(config.VECTOR_STORE_PATH)
         retriever = retriever_handler.get_retriever(db)
         qa_chain = qa_handler.create_qa_chain(retriever)
