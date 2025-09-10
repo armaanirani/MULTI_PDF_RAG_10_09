@@ -1,9 +1,5 @@
 from langchain_community.vectorstores import FAISS
-
-# Configuration for the Retriever
-RETRIEVER_SEARCH_TYPE = "similarity"
-# Number of source documents to retrieve
-RETRIEVER_SEARCH_KWARGS = {"k": 3}
+from .. import config
 
 def get_retriever(db):
     
@@ -11,8 +7,8 @@ def get_retriever(db):
         raise TypeError("Input 'db' must be a FAISS vector store instance.")
     try:
         retriever = db.as_retriever(
-            search_type=RETRIEVER_SEARCH_TYPE,
-            search_kwargs=RETRIEVER_SEARCH_KWARGS
+            search_type=config.RETRIEVER_SEARCH_TYPE,
+            search_kwargs=config.RETRIEVER_SEARCH_KWARGS
         )
         print("Retriever created successfully.")
         

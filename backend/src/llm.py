@@ -1,16 +1,13 @@
 from langchain_openai import ChatOpenAI
-
-# Configuration for the LLM
-LLM_MODEL_NAME = "gpt-5"
-LLM_TEMPERATURE = 0.3
+from .. import config
 
 def load_llm():
     """Loads an OpenAI model"""
     try:
         print("Loading LLM.")
         llm = ChatOpenAI(
-            model=LLM_MODEL_NAME,
-            temperature=LLM_TEMPERATURE
+            model=config.LLM_MODEL_NAME,
+            temperature=config.LLM_TEMPERATURE
         )
         print("LLM loaded successfully.")
         return llm
