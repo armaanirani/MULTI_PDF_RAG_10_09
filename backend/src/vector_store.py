@@ -3,15 +3,15 @@ from langchain_community.vectorstores import FAISS
 from typing import List
 from langchain.docstore.document import Document
 from dotenv import load_dotenv
-from .. import config
+from config import EMBEDDING_MODEL_NAME
 
 load_dotenv()
 
 def _get_embeddings_model():
     """Initializes and returns the OpenAI embedding model"""
-    print(f"Initializing embedding model: {config.EMBEDDING_MODEL_NAME}")
+    print(f"Initializing embedding model: {EMBEDDING_MODEL_NAME}")
     return OpenAIEmbeddings(
-        model=config.EMBEDDING_MODEL_NAME
+        model=EMBEDDING_MODEL_NAME
     )
 
 def create_index(text_chunks: List[Document], save_path: str):

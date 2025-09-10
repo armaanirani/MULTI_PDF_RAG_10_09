@@ -1,5 +1,5 @@
 from langchain_community.vectorstores import FAISS
-from .. import config
+from config import RETRIEVER_SEARCH_KWARGS, RETRIEVER_SEARCH_TYPE
 
 def get_retriever(db):
     
@@ -7,8 +7,8 @@ def get_retriever(db):
         raise TypeError("Input 'db' must be a FAISS vector store instance.")
     try:
         retriever = db.as_retriever(
-            search_type=config.RETRIEVER_SEARCH_TYPE,
-            search_kwargs=config.RETRIEVER_SEARCH_KWARGS
+            search_type=RETRIEVER_SEARCH_TYPE,
+            search_kwargs=RETRIEVER_SEARCH_KWARGS
         )
         print("Retriever created successfully.")
         
