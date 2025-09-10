@@ -1,9 +1,8 @@
 import streamlit as st
 import requests
 import time
+import config
 
-# Configuration for the FastAPI backend URL
-BACKEND_URL = "http://127.0.0.1:8000"
 
 def main():
     """
@@ -41,7 +40,7 @@ def main():
                     files_to_upload = [("files", (file.name, file.getvalue(), file.type)) for file in uploaded_files]
                     
                     try:
-                        response = requests.post(f"{BACKEND_URL}/upload/", files=files_to_upload, timeout=600)
+                        response = requests.post(f"{config.BACKEND_URL}/upload/", files=files_to_upload, timeout=600)
                         if response.status_code == 202:
                             st.success(response.json().get("message", "Processing started!"))
                             with st.spinner("Indexing documents... this can take a moment."):
@@ -75,7 +74,7 @@ def main():
             with st.spinner("Thinking..."):
                 try:
                     payload = {"query": prompt}
-                    response = requests.post(f"{BACKEND_URL}/ask/", json=payload, timeout=300)
+                    response = requests.post(f"{config.BACKEND_URL}/ask/", json=payload, timeout=300)
                     
                     if response.status_code == 200:
                         result = response.json()

@@ -7,11 +7,7 @@ from pydantic import BaseModel
 from typing import List
 
 from src import document_processor, qa_handler, vector_store, retriever_handler
-
-# Define the path for storing the vector index
-VECTOR_STORE_PATH = "../data/faiss_index"
-# Define the path for temporary file uploads
-UPLOAD_DIR = "../data/uploads"
+import config
 
 
 @asynccontextmanager
@@ -22,8 +18,8 @@ async def lifespan(app: FastAPI):
     when the application starts.
     """
     print("Lifespan startup: Creating necessary directories...")
-    os.makedirs(UPLOAD_DIR, exist_ok=True)
-    os.makedirs(os.path.dirname(VECTOR_STORE_PATH), exist_ok=True)
+    os.makedirs(config.UPLOAD_DIR, exist_ok=True)
+    os.makedirs(os.path.dirname(config.VECTOR_STORE_PATH), exist_ok=True)
     print("Lifespan startup: Directories are ready.")
     yield
 
@@ -106,13 +102,13 @@ def process_documents_task(upload_dir: str):
         print(f"   Successfully created {len(text_chunks)} text chunks.")
 
         # Check if an index already exists
-        if os.path.exists(VECTOR_STORE_PATH):
-            print(f"3. Found existing vector store. Updating index at {VECTOR_STORE_PATH}...")
-            vector_store.update_index(text_chunks, VECTOR_STORE_PATH)
+        if os.path.exists(config.VECTOR_STORE_PATH):
+            print(f"3. Found existing vector store. Updating index at {config.VECTOR_STORE_PATH}...")
+            vector_store.update_index(text_chunks, config.VECTOR_STORE_PATH)
             print("   Successfully updated existing vector store.")
         else:
-            print(f"3. No existing vector store found. Creating new index at {VECTOR_STORE_PATH}...")
-            vector_store.create_index(text_chunks, VECTOR_STORE_PATH)
+            print(f"3. No existing vector store found. Creating new index at {config.VECTOR_STORE_PATH}...")
+            vector_store.create_index(text_chunks, config.VECTOR_STORE_PATH)
             print("   Successfully created and saved new vector store.")
 
         print("--- Document processing task completed successfully! ---")
@@ -145,13 +141,13 @@ async def upload_pdfs(
 
     # Save uploaded files to a temporary directory
     for file in files:
-        file_path = os.path.join(UPLOAD_DIR, file.filename)
+        file_path = os.path.join(config.UPLOAD_DIR, file.filename)
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         print(f"Saved file: {file.filename}")
 
     # Add the processing task to run in the background
-    background_tasks.add_task(process_documents_task, UPLOAD_DIR)
+    background_tasks.add_task(process_documents_task, config.UPLOAD_DIR)
 
     return {"message": f"Started processing {len(files)} files. This may take a moment."}
 
@@ -160,7 +156,7 @@ async def ask_question(question: Question):
     """
     Endpoint to ask a question and get an answer from the RAG chain.
     """
-    if not os.path.exists(VECTOR_STORE_PATH):
+    if not os.path.exists(config.VECTOR_STORE_PATH):
         raise HTTPException(
             status_code=404,
             detail="Vector store not found. Please upload documents first."
@@ -168,7 +164,7 @@ async def ask_question(question: Question):
 
     try:
         print(f"Received query: {question.query}")
-        db = vector_store.load_index(VECTOR_STORE_PATH)
+        db = vector_store.load_index(config.VECTOR_STORE_PATH)
         retriever = retriever_handler.get_retriever(db)
         qa_chain = qa_handler.create_qa_chain(retriever)
         
