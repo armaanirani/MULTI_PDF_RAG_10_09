@@ -4,7 +4,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from typing import List
 from langchain.docstore.document import Document
 
-def load_document(source_dir: str) -> List[Document]:
+def load_documents(source_dir: str) -> List[Document]:
     """
     Loads all PDF files from a given source directory.
 
