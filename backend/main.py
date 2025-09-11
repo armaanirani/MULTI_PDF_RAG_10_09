@@ -63,6 +63,11 @@ async def upload_pdfs(
     if not files:
         raise HTTPException(status_code=400, detail="No files were uploaded.")
 
+    # Recreate the upload directory to ensure it's clean for each new upload
+    if os.path.exists(Config.UPLOAD_DIR):
+        shutil.rmtree(Config.UPLOAD_DIR)
+    os.makedirs(Config.UPLOAD_DIR)
+
     # Save uploaded files to a temporary directory
     for file in files:
         file_path = os.path.join(Config.UPLOAD_DIR, file.filename)
