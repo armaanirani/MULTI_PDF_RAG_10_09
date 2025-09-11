@@ -1,10 +1,7 @@
-streamlit
 python-dotenv
 langchain
 langchain-community
 langchain-openai
-langchain-ollama
-langchain-google-genai
 pypdf
 pymupdf
 faiss-cpu
