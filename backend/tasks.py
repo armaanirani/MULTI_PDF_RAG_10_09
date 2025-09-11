@@ -2,7 +2,8 @@ import os
 import shutil
 
 from logger.logger_config import logger
-from src import document_processor, vector_store
+from src.document_processor import DocumentProcessor
+from src.vector_store import VectorStore
 
 def process_documents_task(upload_dir: str, vector_store_path: str):
     """
@@ -15,19 +16,21 @@ def process_documents_task(upload_dir: str, vector_store_path: str):
     logger.info("--- Starting document processing background task ---")
     try:
         logger.info(f"1. Loading documents from: {upload_dir}")
-        raw_documents = document_processor.load_documents(upload_dir)
+        doc_processor = DocumentProcessor(upload_dir)
+        raw_documents = doc_processor.load_documents()
         if not raw_documents:
             logger.warning("No documents found to process. Exiting task.")
             return
         logger.info(f"Successfully loaded {len(raw_documents)} document(s).")
 
         logger.info("2. Splitting documents into text chunks...")
-        text_chunks = document_processor.get_text_chunks(raw_documents)
+        text_chunks = doc_processor.get_text_chunks(raw_documents)
         if not text_chunks:
             logger.error("Failed to create text chunks. Exiting task.")
             return
         logger.info(f"Successfully created {len(text_chunks)} text chunks.")
 
+        vector_store = VectorStore()
         # Check if an index already exists
         if os.path.exists(vector_store_path):
             logger.info(f"3. Found existing vector store. Updating index at {vector_store_path}...")
