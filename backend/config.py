@@ -5,6 +5,10 @@ class Config:
     # Configuration for the LLM
     LLM_MODEL_NAME = "gpt-5"
     LLM_TEMPERATURE = 0.3
+    
+    # Configuration for the text splitter
+    CHUNK_SIZE = 1000
+    CHUNK_OVERLAP = 200
 
     # Configuration for the embedding model 
     EMBEDDING_MODEL_NAME = "text-embedding-3-small"

@@ -4,6 +4,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from typing import List
 from langchain.docstore.document import Document
 
+from config import Config
 from logger.logger_config import logger
 
 class DocumentProcessor:
@@ -62,8 +63,8 @@ class DocumentProcessor:
             return []
         try:
             text_splitter = RecursiveCharacterTextSplitter(
-                chunk_size=1000,
-                chunk_overlap=200
+                chunk_size=Config.CHUNK_SIZE,
+                chunk_overlap=Config.CHUNK_OVERLAP
             )
             chunks = text_splitter.split_documents(documents)
             logger.info(f"Split documents into {len(chunks)} chunks.")
